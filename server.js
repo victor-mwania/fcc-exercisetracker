@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const moment = require('moment')
 
 const User = require('.//models/user')
 const Exercise = require('.//models/exercie')
@@ -75,11 +76,11 @@ app.post('/api/exercise/add', function (req, res) {
           date : Number(Date.now()) 
         })
         xer.save().then((err, exercise) => {
-          if(err){
-            res.send(err)
+          if(exercise){
+            res.json({userId, description,duration, date:moment(date).format('D MMM, YYYY')})
           }
-          else {
-            res.send(exercise)
+          else{
+            res.send("Exercise could not be saved")
           }
         })
       }else{
@@ -89,12 +90,12 @@ app.post('/api/exercise/add', function (req, res) {
           duration,
           date
         })
-        saveExercise.save().then((err, exercise) => {
-          if(err){
-            res.send(err)
+        saveExercise.save().then((exercise) => {
+          if(exercise){
+            res.json({userId, description,duration, date:moment(date).format('D MMM, YYYY')})
           }
           else{
-            res.send(exercise)
+            res.send("Exercise could not be saved")
           }
         })
       }
