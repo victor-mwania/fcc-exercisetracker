@@ -7,7 +7,11 @@ const moment = require('moment')
 const User = require('.//models/user')
 const Exercise = require('.//models/exercie')
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://victor:victor1234@cluster0-shard-00-00-mgep6.mongodb.net:27017,cluster0-shard-00-01-mgep6.mongodb.net:27017,cluster0-shard-00-02-mgep6.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true')
+
+mongoose.connect('mongodb://localhost:27017/pandora', {
+  useNewUrlParser: true
+});
+mongoose.connect(process.env.MONGOLAB_CRIMSON_URI || 'mongodb://localhost:27017/exercise')
 app.use(cors())
 
 app.use(bodyParser.urlencoded({
@@ -45,72 +49,102 @@ app.post('/api/exercise/new-user', function (req, res) {
 })
 // add excercise
 app.post('/api/exercise/add', function (req, res) {
- 
-    let userId =req.body.userId;
-    let description =req.body.description;
-    let duration =req.body.duration;
-    let date =req.body.date;
+
+  let userId = req.body.userId;
+  let description = req.body.description;
+  let duration = req.body.duration;
+  let date = req.body.date;
   User.findById({
     _id: req.body.userId
-  }, (err, user) => {// check f date is null then use the default date (date.now)
-    if(err){
+  }, (err, user) => { // check f date is null then use the default date (date.now)
+    if (err) {
       res.send(err)
     }
     if (!user) {
       res.json({
         error: "UserId is not found"
       })
-    } 
-    else {
-      if(!description) {
-        res.json({description: "Please input a description"})
+    } else {
+      if (!description) {
+        res.json({
+          description: "Please input a description"
+        })
       }
-      if(!duration) {
-        res.json({duration: " Please input duration of the exercise"})
+      if (!duration) {
+        res.json({
+          duration: " Please input duration of the exercise"
+        })
       }
-      if(!date) {
-      let  xer = new Exercise ({
+      if (!date) {
+        let xer = new Exercise({
           userId,
           description,
           duration,
-          date : Number(Date.now()) 
+          date: Number(Date.now())
         })
         xer.save().then((err, exercise) => {
-          if(exercise){
-            res.json({userId, description,duration, date:moment(date).format('D MMM, YYYY')})
-          }
-          else{
+          if (exercise) {
+            res.json({
+              userId,
+              description,
+              duration,
+              date: moment(date).format('D MMM, YYYY')
+            })
+          } else {
             res.send("Exercise could not be saved")
           }
         })
-      }else{
-        let saveExercise = new Exercise ({
+      } else {
+        let saveExercise = new Exercise({
           userId,
           description,
           duration,
           date
         })
         saveExercise.save().then((exercise) => {
-          if(exercise){
-            res.json({userId, description,duration, date:moment(date).format('D MMM, YYYY')})
-          }
-          else{
+          if (exercise) {
+            res.json({
+              userId,
+              description,
+              duration,
+              date: moment(date).format('D MMM, YYYY')
+            })
+          } else {
             res.send("Exercise could not be saved")
           }
         })
       }
-     
+
     }
 
   })
 
 })
-// Not found middleware
-app.use((req, res, next) => {
-  return next({
-    status: 404,
-    message: 'not found'
+
+//log of exercises
+
+app.get('/api/exercise/log', function (req, res) {
+  console.log(req.body)
+  /* user = new User({
+    userId: req.body.userId
   })
+
+  exercise = new Exercise({
+    userId: req.body.userId,
+    date: req.body.date
+  }) */
+  /*  Exercise.find({
+     userId: req.body.userId
+   }, (respose) => {
+     console.log(respose)
+   })
+   // Not found middleware
+   app.use((req, res, next) => {
+     return next({
+       status: 404,
+       message: 'not found'
+     })
+   }) */
 })
 
 // Error Handling middleware
