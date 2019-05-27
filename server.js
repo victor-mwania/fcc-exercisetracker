@@ -114,9 +114,7 @@ app.post('/api/exercise/add', function (req, res) {
           }
         })
       }
-
     }
-
   })
 
 })
@@ -124,27 +122,28 @@ app.post('/api/exercise/add', function (req, res) {
 //log of exercises
 
 app.get('/api/exercise/log', function (req, res) {
-  console.log(req.body)
-  /* user = new User({
-    userId: req.body.userId
-  })
+  let user = req.query.userId
+  let from = req.query.from
+  let end = req.query.end
+  let limit = parseInt(req.query.limit)
 
-  exercise = new Exercise({
-    userId: req.body.userId,
-    date: req.body.date
-  }) */
-  /*  Exercise.find({
-     userId: req.body.userId
-   }, (respose) => {
-     console.log(respose)
-   })
-   // Not found middleware
-   app.use((req, res, next) => {
-     return next({
-       status: 404,
-       message: 'not found'
-     })
-   }) */
+  Exercise.find({
+    userId: user
+  }).where('date').gte(from).lte(end).limit(limit).exec((err, response) => {
+    if (err) {
+      res.send(err)
+    } else {
+      res.send(response)
+    }
+  })
+})
+
+// Not found middleware
+app.use((req, res, next) => {
+  return next({
+    status: 404,
+    message: 'not found'
+  })
 })
 
 // Error Handling middleware
@@ -166,6 +165,6 @@ app.use((err, req, res, next) => {
     .send(errMessage)
 })
 
-const listener = app.listen(process.env.PORT || 3000, () => {
+const listener = app.listen(process.env.PORT || 3001, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 })
