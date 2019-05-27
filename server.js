@@ -8,10 +8,9 @@ const User = require('.//models/user')
 const Exercise = require('.//models/exercie')
 const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://localhost:27017/pandora', {
+mongoose.connect('mongodb://victor:victor1234@cluster0-shard-00-00-vfoph.mongodb.net:27017,cluster0-shard-00-01-vfoph.mongodb.net:27017,cluster0-shard-00-02-vfoph.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true' || 'mongodb://localhost:27017/pandora', {
   useNewUrlParser: true
 });
-mongoose.connect(process.env.MONGOLAB_CRIMSON_URI || 'mongodb://localhost:27017/exercise')
 app.use(cors())
 
 app.use(bodyParser.urlencoded({
@@ -164,7 +163,7 @@ app.use((err, req, res, next) => {
   res.status(errCode).type('txt')
     .send(errMessage)
 })
-
-const listener = app.listen(process.env.PORT || 3001, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
-})
+const port = process.env.PORT
+app.listen(port, function () {
+  console.log('Node.js listening ... ' + port);
+});
